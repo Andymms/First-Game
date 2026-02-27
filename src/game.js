@@ -13,11 +13,26 @@ const player = {
     y: 300,
     radius: 15,
     speed: 4,
-    color: '#4a90e2'
+    color: '#972f2f'
+};
+
+const sword = {
+    angle: 0,
+    length: 40,
+    damage: 20,
+    attacking: false,
+    attackTimer: 0,
+    attackDuration: 10
 };
 
 window.addEventListener('keydown', (e) => {
     game.keys[e.key] = true;
+
+    if (e.key === " " && !sword.attacking) {
+        sword.attacking = true;
+        sword.attackTimer = sword.attackDuration;
+    }
+
 });
 
 window.addEventListener('keyup', (e) => {
@@ -33,6 +48,22 @@ function updatePlayer() {
     // Keep player in bounds
     player.x = Math.max(player.radius, Math.min(game.width - player.radius, player.x));
     player.y = Math.max(player.radius, Math.min(game.height - player.radius, player.y));
+
+}
+
+function updateSword () {
+    if (game.keys["w"] || game.keys["ArrowUp"]) sword.angle = -Math.PI / 2;
+    if (game.keys["s"] || game.keys["ArrowDown"]) sword.angle = Math.PI / 2;
+    if (game.keys["a"] || game.keys["ArrowLeft"]) sword.angle = Math.PI;
+    if (game.keys["d"] || game.keys["ArrowRight"]) sword.angle = 0;
+
+    if (sword.attacking) {
+        sword.attackTimer--;
+        if (sword.attackTimer <= 0) {
+            sword.attacking = false;
+        }
+    }
+
 }
 
 // Draw everything
@@ -48,16 +79,33 @@ function draw() {
     ctx.fill();
     
     // Draw "sword" (just a line for now)
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 3;
+    // Calculate sword position
+    let swordLength = sword.length;
+    if (sword.attacking) {
+        swordLength = sword.length * 1.5; // Extend on attack
+    }
+
+    const swordX = player.x + Math.cos(sword.angle) * swordLength;
+    const swordY = player.y + Math.sin(sword.angle) * swordLength;
+
+    // Draw sword
+    ctx.strokeStyle = sword.attacking ? '#ff0' : '#fff'; // Yellow when attacking
+    ctx.lineWidth = sword.attacking ? 6 : 4;
     ctx.beginPath();
-    ctx.moveTo(player.x + 20, player.y);
-    ctx.lineTo(player.x + 40, player.y);
+    ctx.moveTo(player.x, player.y);
+    ctx.lineTo(swordX, swordY);
     ctx.stroke();
+
+    // Draw tip
+    ctx.beginPath();
+    ctx.arc(swordX, swordY, sword.attacking ? 8 : 6, 0, Math.PI * 2);
+    ctx.fillStyle = sword.attacking ? '#ff0' : '#fff';
+    ctx.fill();
 }
 
 function gameLoop() {
     updatePlayer();
+    updateSword();
     draw();
     requestAnimationFrame(gameLoop);
 }
