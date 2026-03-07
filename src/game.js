@@ -6,7 +6,8 @@ const game = {
     height: 600,
     keys: {},
     spawnTimer: 0,
-    spawnInterval: 120
+    spawnInterval: 100,
+    gameOver: false
 };
 
 const player = {
@@ -14,7 +15,9 @@ const player = {
     y: 300,
     radius: 20,
     speed: 4,
-    color: '#972f2f'
+    color: '#972f2f',
+    hp: 100,
+    maxHp: 100
 };
 
 const sword = {
@@ -27,22 +30,20 @@ const sword = {
     slashProgress: 0
 };
 
-const enemies = [];
+let enemies = [];
+let particles = [];
 
 window.addEventListener('keydown', (e) => {
     game.keys[e.key] = true;
+    if (e.key === " " && !sword.attacking && !game.gameOver) {
+        sword.attacking = true;
+        sword.attackTimer = sword.attackDuration;
+    }
+    if (e.key.toLowerCase() === 'r' && game.gameOver) resetGame();
 });
 
 window.addEventListener('keyup', (e) => {
     game.keys[e.key] = false;
-});
-
-window.addEventListener("keydown", (e) => {
-    game.keys[e.key] = true;
-    if (e.key === " " && !sword.attacking) {
-        sword.attacking = true;
-        sword.attackTimer = sword.attackDuration;
-    }
 });
 
 function updatePlayer() {
@@ -77,7 +78,7 @@ function spawnEnemy() {
         radius: 15,
         speed: 1,
         color: '#2f972f',
-        health: 20
+        health: 40
     };
 
     const edge = Math.floor(Math.random() * 4);
@@ -111,15 +112,56 @@ function updateEnemies() {
     });
 }
 
+function checkCollisions() {
+    enemies.forEach(enemy => {
+        const dx = enemy.x - player.x;
+        const dy = enemy.y - player.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < player.radius + enemy.radius) {
+            player.hp -= 0.2; 
+            if (player.hp <= 0) game.gameOver = true;
+        }
+
+        if (sword.attacking) {
+            const swordArc = Math.PI / 4; // Total width of the hit zone
+            const distToEnemy = distance;
+            
+            if (distToEnemy < sword.length + enemy.radius) {
+                const angleToEnemy = Math.atan2(dy, dx);
+                
+                let angleDiff = angleToEnemy - sword.angle;
+                
+                while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+                while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+
+                if (Math.abs(angleDiff) < swordArc) {
+                    enemy.health -= sword.damage;
+                    enemy.x += Math.cos(angleToEnemy) * 10;
+                    enemy.y += Math.sin(angleToEnemy) * 10;
+                }
+            }
+        }
+    });
+
+    enemies = enemies.filter(enemy => enemy.health > 0);
+}
+
 function draw() {
     ctx.fillStyle = '#16213e';
     ctx.fillRect(0, 0, game.width, game.height);
 
-    // Draw player
+    // Player
     ctx.beginPath();
     ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
     ctx.fillStyle = player.color;
     ctx.fill();
+
+    // Health bar
+    ctx.fillStyle = '#333';
+    ctx.fillRect(player.x - 25, player.y - 35, 50, 6);
+    ctx.fillStyle = player.hp > 30 ? '#2f972f' : '#972f2f'; // Green, turns red when low
+    ctx.fillRect(player.x - 25, player.y - 35, (player.hp / player.maxHp) * 50, 6);
 
     if (sword.attacking) {
         const currentLength = sword.length;
@@ -153,9 +195,24 @@ function draw() {
 
 }
 
+function resetGame() {
+    player.hp = 100;
+    player.x = 400;
+    player.y = 300;
+    enemies = [];
+    particles = [];
+    game.gameOver = false;
+}
+
 function gameLoop() {
+
+    if (game.gameOver) {
+        return;
+    }
+
     updatePlayer();
     updateSword();
+    checkCollisions();
 
     game.spawnTimer++;
     if (game.spawnTimer >= game.spawnInterval) {
