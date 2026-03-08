@@ -7,7 +7,9 @@ const game = {
     keys: {},
     spawnTimer: 0,
     spawnInterval: 100,
-    gameOver: false
+    gameOver: false,
+    screenShake: false,
+    screenShakeProgress: 10
 };
 
 const player = {
@@ -39,7 +41,7 @@ window.addEventListener('keydown', (e) => {
         sword.attacking = true;
         sword.attackTimer = sword.attackDuration;
     }
-    if (e.key.toLowerCase() === 'r' && game.gameOver) resetGame();
+    if (e.key.toLowerCase() === 'r' && !game.gameOver) resetGame();
 });
 
 window.addEventListener('keyup', (e) => {
@@ -137,8 +139,11 @@ function checkCollisions() {
 
                 if (Math.abs(angleDiff) < swordArc) {
                     enemy.health -= sword.damage;
-                    enemy.x += Math.cos(angleToEnemy) * 10;
-                    enemy.y += Math.sin(angleToEnemy) * 10;
+                    enemy.x += Math.cos(angleToEnemy) * 60;
+                    enemy.y += Math.sin(angleToEnemy) * 60;
+
+                    game.screenShake = true
+                    game.screenShakeProgress = 10
                 }
             }
         }
@@ -148,9 +153,20 @@ function checkCollisions() {
 }
 
 function draw() {
+
     ctx.fillStyle = '#16213e';
     ctx.fillRect(0, 0, game.width, game.height);
 
+    ctx.save();
+    
+    if (game.screenShake && game.screenShakeProgress > 0) { 
+        let x = (Math.random() - 0.5) * 3;
+        let y = (Math.random() - 0.5) * 3;
+        ctx.translate(x, y)
+
+        game.screenShakeProgress--;
+        if (game.screenShakeProgress <= 0) game.screenShake = false 
+    }
     // Player
     ctx.beginPath();
     ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
@@ -160,7 +176,7 @@ function draw() {
     // Health bar
     ctx.fillStyle = '#333';
     ctx.fillRect(player.x - 25, player.y - 35, 50, 6);
-    ctx.fillStyle = player.hp > 30 ? '#2f972f' : '#972f2f'; // Green, turns red when low
+    ctx.fillStyle = player.hp > 30 ? '#2f972f' : '#972f2f';
     ctx.fillRect(player.x - 25, player.y - 35, (player.hp / player.maxHp) * 50, 6);
 
     if (sword.attacking) {
@@ -173,12 +189,11 @@ function draw() {
         ctx.beginPath();
         ctx.moveTo(player.x  , player.y);  // Center of player
         ctx.arc(player.x, player.y, currentLength, sword.angle - arcSize, sword.angle + arcSize);
-        ctx.closePath();  // Back to center
+        ctx.closePath();
 
-        ctx.fillStyle = '#fff';  // Solid white
+        ctx.fillStyle = '#fff'
         ctx.fill();
     
-        // Thin outline
         ctx.strokeStyle = '#ddd';
         ctx.lineWidth = 2;
         ctx.stroke();
@@ -192,6 +207,8 @@ function draw() {
         ctx.fillStyle = enemy.color;
         ctx.fill();
     });
+
+    ctx.restore();
 
 }
 
