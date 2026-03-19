@@ -6,9 +6,23 @@ import { useState, useEffect } from 'react';
 export const Game = () => {
 
     useEffect(() => {
-        if (window.startGame) {
-            window.startGame();
-        }
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        const tryStartGame = () => {
+            if (typeof window.startGame === 'function') {
+                console.log("Game engine found! Starting...");
+                window.startGame();
+            } else if (attempts < maxAttempts) {
+                attempts++;
+                console.log(`Waiting for game.js... (Attempt ${attempts})`);
+                setTimeout(tryStartGame, 100); // Try again in 100ms
+            } else {
+                console.error("Could not find window.startGame after 10 attempts.");
+            }
+        };
+
+        tryStartGame();
     }, []);
 
     const [isPaused, setIsPaused] = useState(false);

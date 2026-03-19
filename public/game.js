@@ -1,6 +1,9 @@
-function startGame() {
+window.startGame = function() {
     const canvas = document.getElementById('game');
-    if (!canvas) return;
+    if (!canvas) {
+        console.error("Canvas element not found!");
+        return;
+    };
     const ctx = canvas.getContext('2d');
 
     const game = {
@@ -358,5 +361,3 @@ function startGame() {
 
     gameLoop();
 }
-
-window.startGame = startGame;

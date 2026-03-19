@@ -1,40 +1,16 @@
-# ⚔️ Ninja Survivor
+# React + Vite
 
-A fast-paced browser action game inspired by **Hollow Knight** and **Vampire Survivors**.  
-Built from scratch in **HTML5 Canvas** with vanilla JavaScript—no engines, no libraries.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-&gt; **Status:** Work in Progress
----
+Currently, two official plugins are available:
 
-## 🎮 Core Features
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-| Feature | Status | Tech Highlight |
-|---------|--------|----------------|
-| **Snappy Combat** | ✅ Done | Hollow Knight-style slash with hit detection |
-| **Enemy AI** | ✅ Done | Procedural spawning, pathfinding to player |
-| **Game Feel** | ✅ Done | Screenshake, particle effects, juice |
-| **Progression** | 🚧 WIP | XP system, upgrades, weapon evolutions |
-| **UI** | 🚧 WIP | Game over screen, Start menu, Level up pop up |
-| **Enemy variety** | 📋 Planned | Larger enemies, Boss, Shooting enemies |
-| **Audio** | 📋 Planned | Dynamic sound effects, music |
-| **Choice Progression** | 📋 Planned | Shop, Skill Tree |
-| **Abilities** | 📋 Planned | On every level up, give the player 3 options for abilities to choose from |
+## React Compiler
 
----
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## 🕹 How to Play
-**WASD / Arrows** = Move
-**SPACE** = Attack (slash in facing direction)
-**Goal:** Survive waves of enemies. Slash them before they touch you.
+## Expanding the ESLint configuration
 
-## 🛠 Tech Stack
-**Core:** HTML5 Canvas API, vanilla JavaScript  
-**Architecture:** Entity-component pattern, game loop with fixed timestep
-**Tools:** VS Code, Git, GitHub Pages (deployment)
-
-**Why no engine?**  
-Learning game development from the ground up—understanding loops, collision, AI behavior trees, and rendering pipelines at the code level.
-
-
-## Built by Andrea Mujica
-
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.

@@ -1,6 +1,5 @@
 import React from 'react';
-import './index.css';
-import useEffect from 'react';
+import { useState, useEffect } from 'react';
 
 export const GamePaused = ({ onResume }) => {
 
@@ -13,11 +12,21 @@ export const GamePaused = ({ onResume }) => {
     }, []);
 
     return (
-        <div className="pause-overlay">
-            <div className="pause-card">
-                <h1>PAUSED</h1>
-                <button onClick={onResume}>RESUME GAME</button>
-                <button onClick={() => window.location.reload()}>QUIT</button>
+        <div className="vw-100 vh-100 d-flex justify-content-center align-items-center" 
+            style={{ backgroundColor: 'rgba(0,0,0,0.6)', position: 'fixed', top: 0, left: 0, zIndex: 1000 }}>
+
+            <div className="card bg-dark border-primary shadow-lg p-4 text-center" style={{ width: '300px' }}>
+                <h1 className="text-primary mb-4">PAUSED</h1>
+                
+                <div className="d-grid gap-3">
+                    <button className="btn btn-primary btn-lg" onClick={onResume}>
+                        RESUME GAME
+                    </button>
+                    
+                    <button className="btn btn-outline-danger" onClick={() => window.location.reload()}>
+                        QUIT
+                    </button>
+                </div>
             </div>
         </div>
     );
