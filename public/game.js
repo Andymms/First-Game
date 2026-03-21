@@ -1,4 +1,4 @@
-window.startGame = function() {
+window.startGame = function () {
     const canvas = document.getElementById('game');
     if (!canvas) {
         console.error("Canvas element not found!");
@@ -48,7 +48,8 @@ window.startGame = function() {
         isPaused: false,
         showLevelUp: false,
         level: 1,
-        gameOver: false
+        gameOver: false,
+        hasSentGameOver: false
     }
 
     window.gameData = {
@@ -59,11 +60,11 @@ window.startGame = function() {
 
     window.addEventListener('keydown', (e) => {
         game.keys[e.key] = true;
-        if (e.key === " " && !sword.attacking && !game.gameOver) {
+        if (e.key === " " && !sword.attacking && !window.gameState.gameOver && !window.gameState.isPaused) {
             sword.attacking = true;
             sword.attackTimer = sword.attackDuration;
         }
-        if (e.key.toLowerCase() === 'r' && !game.gameOver) resetGame();
+        if (e.key.toLowerCase() === 'r' && !window.gameState.gameOver) resetGame();
     });
 
     window.addEventListener('keyup', (e) => {
@@ -144,7 +145,10 @@ window.startGame = function() {
 
             if (distance < player.radius + enemy.radius) {
                 player.hp -= 0.8;
-                if (player.hp <= 0) window.gameState.gameOver = true;
+                if (player.hp <= 0) {
+                    window.gameState.gameOver = true;
+                    window.gameState.isPaused = true;
+                }
             }
 
             if (sword.attacking) {
@@ -321,6 +325,12 @@ window.startGame = function() {
         let barWidth = (player.xp / player.nextLevelXp) * game.width;
         ctx.fillRect(0, 0, barWidth, 10);
 
+        if (window.gameState.gameOver) {
+            ctx.filter = 'grayscale(100%) brightness(40%)';
+        }
+
+        ctx.filter = 'none';
+
     }
 
     function resetGame() {
@@ -331,14 +341,22 @@ window.startGame = function() {
         particles.length = 0;
         xpGems.length = 0;
         window.gameState.gameOver = false;
+        window.gameState.hasSentGameOver = false;
+        window.gameState.isPaused = false;
+        window.gameState.level = 1;
     }
 
     function gameLoop() {
 
-        if (!window.gameState.isPaused) {
-            if (game.gameOver) {
-                return;
+        if (window.gameState.gameOver && !window.gameState.hasSentGameOver) {
+            window.gameState.hasSentGameOver = true;
+
+            if (window.reactShowGameOver) {
+                window.reactShowGameOver(player.level);
             }
+        }
+
+        if (!window.gameState.isPaused) {
 
             updatePlayer();
             updateSword();

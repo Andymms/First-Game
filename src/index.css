@@ -25,3 +25,7 @@ canvas {
 .ui-overlay>* {
   pointer-events: auto;
 }
+
+.pause-title {
+  color: yellow !important;
+}

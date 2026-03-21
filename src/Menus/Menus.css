@@ -1,0 +1,32 @@
+.paused-overlay {
+    background-color: rgba(0,0,0,0.4);
+    position: fixed;
+    top: 0;
+    left: 0; 
+    z-index: 1000;
+}
+
+.paused-container {
+    width: 300px;
+}
+
+.game-over-overlay {
+    background-color: rgba(50, 0, 0, 0.4);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 3000;
+}
+
+.btn-grow {
+    transition: transform 0.2s ease-in-out; 
+}
+
+.btn-grow:hover {
+    transform: scale(1.1); 
+    filter: brightness(1.2); 
+}
+
+.btn-grow:active {
+    transform: scale(0.95); 
+}
