@@ -29,7 +29,13 @@ export const Game = () => {
     const [isPaused, setIsPaused] = useState(false);
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.key === 'Escape') setIsPaused(prev => !prev);
+            if (e.key === 'Escape') {
+            setIsPaused(prev => {
+                    const newState = !prev;
+                    if (window.gameState) window.gameState.isPaused = newState;
+                    return newState;
+                });
+            }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
@@ -43,7 +49,16 @@ export const Game = () => {
             setIsGameOver(true);
             setFinalLevel(level);
         };
-        return () => { delete window.reactShowGameOver; };
+
+        window.reactHideGameOver = () => {
+            setIsGameOver(false);
+        };
+
+        return () => { 
+            delete window.reactShowGameOver; 
+            delete window.reactHideGameOver;
+        };
+
     }, []);
 
     return (

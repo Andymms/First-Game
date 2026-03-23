@@ -24,6 +24,7 @@ window.startGame = function () {
         color: '#972f2f',
         hp: 100,
         maxHp: 100,
+        Iframes: 0,
         xp: 0,
         nextLevelXp: 100,
         level: 1,
@@ -64,7 +65,12 @@ window.startGame = function () {
             sword.attacking = true;
             sword.attackTimer = sword.attackDuration;
         }
-        if (e.key.toLowerCase() === 'r' && !window.gameState.gameOver) resetGame();
+        if (e.key.toLowerCase() === 'r') {
+            resetGame();
+            if (window.reactHideGameOver) {
+                window.reactHideGameOver();
+            }
+        }
     });
 
     window.addEventListener('keyup', (e) => {
@@ -79,6 +85,10 @@ window.startGame = function () {
 
         player.x = Math.max(player.radius, Math.min(game.width - player.radius, player.x));
         player.y = Math.max(player.radius, Math.min(game.height - player.radius, player.y));
+
+        if (player.Iframes > 0) {
+            player.Iframes--;
+        }
     }
 
     function updateSword() {
@@ -138,16 +148,29 @@ window.startGame = function () {
     }
 
     function checkCollisions() {
+
         enemies.forEach(enemy => {
+
+            if (!enemy || enemy.health <= 0 || (enemy.x === 0 && enemy.y === 0)) return;
+
             const dx = enemy.x - player.x;
             const dy = enemy.y - player.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (distance < player.radius + enemy.radius) {
-                player.hp -= 0.8;
-                if (player.hp <= 0) {
-                    window.gameState.gameOver = true;
-                    window.gameState.isPaused = true;
+            if (distance < (player.radius + enemy.radius) * 0.7) {
+                if (player.Iframes <= 0) {
+                    player.hp -= 20
+                    player.Iframes = 60
+                    game.screenShake = true
+
+                    if (player.hp <= 0) {
+                        console.log("Game Over!");
+                        console.log("Hp:", player.hp);
+                        console.log("Killed by enemy at:", enemy.x, enemy.y)
+                        window.gameState.gameOver = true;
+                        window.gameState.isPaused = true;
+                    }
+
                 }
             }
 
@@ -175,6 +198,9 @@ window.startGame = function () {
             }
         });
 
+    }
+
+    function cleanUpEnemies() {
         for (let i = enemies.length - 1; i >= 0; i--) {
             if (enemies[i].health <= 0) {
                 for (let p = 0; p < 10; p++) {
@@ -195,9 +221,7 @@ window.startGame = function () {
                 enemies.splice(i, 1);
             }
         }
-
     }
-
 
     function updateParticles() {
 
@@ -234,7 +258,8 @@ window.startGame = function () {
                     player.xp -= player.nextLevelXp;
                     player.nextLevelXp += 50;
                     player.speed = Math.min(5, player.speed + 0.5);
-                    player.maxHp = Math.min(150, player.maxHp + 10);
+                    player.maxHp = Math.max(100, player.maxHp + 10);
+                    console.log("Leveled up! New HP:", player.hp);
                     player.hp = player.maxHp;
                     sword.damage = Math.min(50, sword.damage + 2);
                     sword.attackDuration = Math.max(8, sword.attackDuration - 0.5);
@@ -260,11 +285,19 @@ window.startGame = function () {
             if (game.screenShakeProgress <= 0) game.screenShake = false
         }
 
+        ctx.save();
+
+        if (player.Iframes > 0) {
+            ctx.globalAlpha = 0.5; 
+        }
+
         // Player
         ctx.beginPath();
         ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
         ctx.fillStyle = player.color;
         ctx.fill();
+
+        ctx.restore();
 
         // Health bar
         ctx.fillStyle = '#333';
@@ -315,6 +348,7 @@ window.startGame = function () {
             ctx.fill();
         });
 
+
         ctx.restore();
 
         // Player XP bar
@@ -337,9 +371,12 @@ window.startGame = function () {
         player.hp = 100;
         player.x = 400;
         player.y = 300;
+        player.Iframes = 0;
+
         enemies.length = 0;
         particles.length = 0;
         xpGems.length = 0;
+
         window.gameState.gameOver = false;
         window.gameState.hasSentGameOver = false;
         window.gameState.isPaused = false;
@@ -356,11 +393,13 @@ window.startGame = function () {
             }
         }
 
-        if (!window.gameState.isPaused) {
+        if (!window.gameState.isPaused && !window.gameState.gameOver) {
 
             updatePlayer();
             updateSword();
+
             checkCollisions();
+            cleanUpEnemies();
             updateParticles();
 
             game.spawnTimer++;
