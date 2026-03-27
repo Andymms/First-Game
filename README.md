@@ -14,7 +14,7 @@ Built from scratch in **HTML5 Canvas** with vanilla JavaScript—no engines, no 
 | **Enemy AI** | ✅ Done | Procedural spawning, pathfinding to player |
 | **Game Feel** | ✅ Done | Screenshake, particle effects, juice |
 | **Progression** | 🚧 WIP | XP system, upgrades, weapon evolutions |
-| **UI** | 🚧 WIP | Game over screen, Start menu, Level up pop up |
+| **UI** | ✅ Done | Game over screen, Start menu, Level up pop up |
 | **Enemy variety** | 📋 Planned | Larger enemies, Boss, Shooting enemies |
 | **Audio** | 📋 Planned | Dynamic sound effects, music |
 | **Choice Progression** | 📋 Planned | Shop, Skill Tree |
