@@ -1,0 +1,16 @@
+.level-up-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00d4ff;
+    text-shadow: #00d4ff 0px 0px 5px, #00d4ff 0px 0px 15px, #00d4ff 0px 0px 25px;
+    align-items: flex-start;
+    background: rgba(255, 215, 0, 0.2);
+    padding: 10px 30px;
+    backdrop-filter: blur(1px);
+}
+
+.level-up-title {
+    font-size: 50px;
+}

@@ -3,6 +3,7 @@ import './index.css';
 import { useState, useEffect } from 'react';
 import { GamePaused } from './Menus/GamePaused';
 import { GameOver } from './Menus/GameOver';
+import { LevelUp } from './HUD/LevelUp';
 
 export const Game = () => {
 
@@ -61,6 +62,21 @@ export const Game = () => {
 
     }, []);
 
+    const [showLevelUp, setShowLevelUp] = useState(false);
+    const [currentLevel, setCurrentLevel] = useState(1);
+
+    useEffect(() => {
+        window.reactLevelUp = () => {
+            setShowLevelUp(true);
+            setCurrentLevel(window.gameState?.level || 1);
+            setTimeout(() => {
+                setShowLevelUp(false);
+            }, 2000);
+        };
+        return () => { delete window.reactLevelUp; };
+
+    }, []);
+
     return (
         <div className="game-container">
             <canvas id="game" width={800} height={600}></canvas>
@@ -68,6 +84,7 @@ export const Game = () => {
             <div className="ui-overlay">
                 {isPaused && <GamePaused onResume={() => setIsPaused(false)} />}
                 {isGameOver && <GameOver level={finalLevel} />}
+                {showLevelUp && <LevelUp level={currentLevel} />}
             </div>
         </div>
     );

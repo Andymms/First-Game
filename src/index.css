@@ -6,8 +6,8 @@
 
 canvas {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: 800px;
+  height: 600px;
 }
 
 .ui-overlay {
@@ -24,8 +24,4 @@ canvas {
 
 .ui-overlay>* {
   pointer-events: auto;
-}
-
-.pause-title {
-  color: yellow !important;
 }

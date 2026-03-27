@@ -284,6 +284,12 @@ window.startGame = function (instanceID) {
                     sword.damage = Math.min(50, sword.damage + 2);
                     sword.attackDuration = Math.max(8, sword.attackDuration - 0.5);
                     game.spawnInterval = Math.max(20, game.spawnInterval - 2);
+
+                    window.gameState.level = player.level;
+                    if (typeof window.reactLevelUp === 'function') {
+                        window.reactLevelUp(player.level);
+                    }
+
                 }
             }
         };
