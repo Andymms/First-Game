@@ -16,7 +16,7 @@ export const GamePaused = ({ onResume }) => {
         <div className="vw-100 vh-100 d-flex justify-content-center align-items-center paused-overlay">
 
             <div className="p-4 text-center paused-container">
-                <h1 className="shadow-lg mb-4 text-light">
+                <h1 className="shadow-lg mb-4 text-light ui-text">
                     PAUSED
                 </h1>
                 

@@ -7,30 +7,30 @@ import { GameOver } from './Menus/GameOver';
 export const Game = () => {
 
     useEffect(() => {
-        let attempts = 0;
-        const maxAttempts = 10;
+        const instanceId = Date.now();
+        window.currentGameId = instanceId;
 
         const tryStartGame = () => {
             if (typeof window.startGame === 'function') {
-                console.log("Game engine found! Starting...");
-                window.startGame();
-            } else if (attempts < maxAttempts) {
-                attempts++;
-                console.log(`Waiting for game.js... (Attempt ${attempts})`);
-                setTimeout(tryStartGame, 100); // Try again in 100ms
-            } else {
-                console.error("Could not find window.startGame after 10 attempts.");
+                console.log("Starting Game Instance:", instanceId);
+                window.startGame(instanceId);
             }
         };
 
         tryStartGame();
+
+        return () => {
+            if (window.currentGameId === instanceId) {
+                window.currentGameId = null;
+            }
+        };
     }, []);
 
     const [isPaused, setIsPaused] = useState(false);
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape') {
-            setIsPaused(prev => {
+                setIsPaused(prev => {
                     const newState = !prev;
                     if (window.gameState) window.gameState.isPaused = newState;
                     return newState;
@@ -45,7 +45,7 @@ export const Game = () => {
     const [finalLevel, setFinalLevel] = useState(1);
 
     useEffect(() => {
-        window.reactShowGameOver = ( level ) => {
+        window.reactShowGameOver = (level) => {
             setIsGameOver(true);
             setFinalLevel(level);
         };
@@ -54,8 +54,8 @@ export const Game = () => {
             setIsGameOver(false);
         };
 
-        return () => { 
-            delete window.reactShowGameOver; 
+        return () => {
+            delete window.reactShowGameOver;
             delete window.reactHideGameOver;
         };
 

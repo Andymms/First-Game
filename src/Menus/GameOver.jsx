@@ -8,8 +8,8 @@ export const GameOver = ({ level }) => {
             <div className="text-center p-5" 
                 style={{ minWidth: '400px' }}>
                 
-                <h1 className="display-1 fw-bold text-danger mb-2">WASTED</h1>
-                <p className="fs-3 text-white mb-4">You survived until Level {level}</p>
+                <h1 className="display-1 fw-bold text-danger mb-2 wasted-title">WASTED</h1>
+                <p className="fs-3 text-white mb-4 wasted-menu">You survived until Level {level}</p>
                 
                 <div className="d-grid gap-3">
                     <button 

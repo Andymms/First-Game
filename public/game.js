@@ -1,10 +1,13 @@
-window.startGame = function () {
+window.startGame = function (instanceID) {
     const canvas = document.getElementById('game');
-    if (!canvas) {
-        console.error("Canvas element not found!");
-        return;
-    };
     const ctx = canvas.getContext('2d');
+
+    function resize() {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = 800;
+        canvas.height = 600;
+    }
+    resize();
 
     const game = {
         width: 800,
@@ -15,6 +18,14 @@ window.startGame = function () {
         screenShake: false,
         screenShakeProgress: 10
     };
+
+    window.gameState = {
+        isPaused: false,
+        showLevelUp: false,
+        level: 1,
+        gameOver: false,
+        hasSentGameOver: false
+    }
 
     const player = {
         x: 400,
@@ -45,21 +56,20 @@ window.startGame = function () {
     let particles = [];
     let xpGems = [];
 
-    window.gameState = {
-        isPaused: false,
-        showLevelUp: false,
-        level: 1,
-        gameOver: false,
-        hasSentGameOver: false
-    }
-
     window.gameData = {
         player,
         sword,
         game,
     }
 
-    window.addEventListener('keydown', (e) => {
+
+    const handleKeyDown = (e) => {
+
+        if (window.currentGameId !== instanceID) {
+            window.removeEventListener('keydown', handleKeyDown);
+            return;
+        }
+
         game.keys[e.key] = true;
         if (e.key === " " && !sword.attacking && !window.gameState.gameOver && !window.gameState.isPaused) {
             sword.attacking = true;
@@ -71,11 +81,18 @@ window.startGame = function () {
                 window.reactHideGameOver();
             }
         }
-    });
+    }
 
-    window.addEventListener('keyup', (e) => {
+    const handleKeyUp = (e) => {
+        if (window.currentGameId !== instanceID) {
+            window.removeEventListener('keyup', handleKeyUp);
+            return;
+        }
         game.keys[e.key] = false;
-    });
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
     function updatePlayer() {
         if (game.keys['w'] || game.keys['ArrowUp']) player.y -= player.speed;
@@ -157,8 +174,11 @@ window.startGame = function () {
             const dy = enemy.y - player.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (distance < (player.radius + enemy.radius) * 0.7) {
+            const collisionThreshold = player.radius + enemy.radius;
+
+            if (distance < collisionThreshold * 0.7) {
                 if (player.Iframes <= 0) {
+                    console.log(`REAL HIT! Dist: ${distance.toFixed(1)} vs Threshold: ${collisionThreshold}`);
                     player.hp -= 20
                     player.Iframes = 60
                     game.screenShake = true
@@ -288,7 +308,7 @@ window.startGame = function () {
         ctx.save();
 
         if (player.Iframes > 0) {
-            ctx.globalAlpha = 0.5; 
+            ctx.globalAlpha = 0.5;
         }
 
         // Player
@@ -384,6 +404,11 @@ window.startGame = function () {
     }
 
     function gameLoop() {
+
+        if (window.currentGameId !== instanceID) {
+            console.log("Killing old ghost loop:", instanceID);
+            return;
+        }
 
         if (window.gameState.gameOver && !window.gameState.hasSentGameOver) {
             window.gameState.hasSentGameOver = true;
