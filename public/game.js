@@ -269,7 +269,7 @@ window.startGame = function (instanceID) {
                 gem.y += Math.sin(angle) * 3;
             }
 
-            if (distance < player.radius + 10) {
+            if (distance < player.radius + 15) {
                 xpGems.splice(index, 1);
                 player.xp += gem.value;
                 if (player.xp >= player.nextLevelXp) {
@@ -371,18 +371,51 @@ window.startGame = function (instanceID) {
             ctx.fill();
         });
 
+
+
+
         particles.forEach(particle => {
             ctx.beginPath();
             ctx.arc(particle.x, particle.y, 3, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(107, 0, 0, ${particle.life / 30})`;
             ctx.fill();
+
         });
 
+        const XpGemImg = new Image();
+        XpGemImg.src = 'assets/XpGem(Trimmed).png';
+
         xpGems.forEach(gem => {
-            ctx.beginPath();
-            ctx.arc(gem.x, gem.y, 10, 0, Math.PI * 2);
-            ctx.fillStyle = '#fff240';
-            ctx.fill();
+            if (XpGemImg.complete) {
+                const bob = Math.sin(Date.now() / 200) * 5;
+
+                // --- GLOW START ---
+                ctx.save();
+                ctx.translate(gem.x, gem.y + bob);
+                ctx.scale(0.7, 1.3); //diamond shape scaling
+
+                ctx.globalCompositeOperation = 'lighter';
+
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 25);
+                gradient.addColorStop(0, 'rgba(7, 207, 247, 0.8)');
+                gradient.addColorStop(0.4, 'rgba(0, 212, 255, 0.3)');
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                ctx.fillStyle = gradient;
+
+                ctx.beginPath();
+                ctx.arc(0, 0, 25, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+                // --- GLOW END ---
+                ctx.drawImage(XpGemImg, gem.x - 9, gem.y - 16 + bob, 18, 32);
+            } else {
+                ctx.beginPath();
+                ctx.arc(gem.x, gem.y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = '#09dff8';
+                ctx.fill();
+            }
         });
 
 
