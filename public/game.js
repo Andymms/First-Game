@@ -182,6 +182,7 @@ window.startGame = function (instanceID) {
                     player.hp -= 20
                     player.Iframes = 60
                     game.screenShake = true
+                    game.screenShakeProgress = 10
 
                     if (player.hp <= 0) {
                         console.log("Game Over!");
@@ -189,6 +190,7 @@ window.startGame = function (instanceID) {
                         console.log("Killed by enemy at:", enemy.x, enemy.y)
                         window.gameState.gameOver = true;
                         window.gameState.isPaused = true;
+                        player.Iframes = 0;
                     }
 
                 }
@@ -283,7 +285,7 @@ window.startGame = function (instanceID) {
                     player.hp = player.maxHp;
                     sword.damage = Math.min(50, sword.damage + 2);
                     sword.attackDuration = Math.max(8, sword.attackDuration - 0.5);
-                    game.spawnInterval = Math.max(20, game.spawnInterval - 2);
+                    game.spawnInterval = Math.max(20, game.spawnInterval - 5);
 
                     window.gameState.level = player.level;
                     if (typeof window.reactLevelUp === 'function') {
@@ -313,17 +315,17 @@ window.startGame = function (instanceID) {
 
         ctx.save();
 
-        if (player.Iframes > 0) {
-            ctx.globalAlpha = 0.5;
-        }
-
         const floorImg = new Image();
-        floorImg.src = 'assets/FloorTile(2).png';
+        floorImg.src = 'assets/FloorTile(4).png';
 
         if (floorImg.complete) {
             const pattern = ctx.createPattern(floorImg, 'repeat');
             ctx.fillStyle = pattern;
             ctx.fillRect(0, 0, game.width, game.height);
+        }
+
+        if (player.Iframes > 0) {
+            ctx.globalAlpha = 1 - player.Iframes / 60;
         }
 
         // Player
