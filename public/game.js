@@ -317,6 +317,15 @@ window.startGame = function (instanceID) {
             ctx.globalAlpha = 0.5;
         }
 
+        const floorImg = new Image();
+        floorImg.src = 'assets/FloorTile(2).png';
+
+        if (floorImg.complete) {
+            const pattern = ctx.createPattern(floorImg, 'repeat');
+            ctx.fillStyle = pattern;
+            ctx.fillRect(0, 0, game.width, game.height);
+        }
+
         // Player
         ctx.beginPath();
         ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
